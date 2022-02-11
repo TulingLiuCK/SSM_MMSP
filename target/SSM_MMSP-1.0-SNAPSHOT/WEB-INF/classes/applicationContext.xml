@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                         http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+                        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+    <!--读取jdbc.properties属性文件-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <!--创建数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!--整合mybatis-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="configLocation" value="classpath:SqlMapConfig.xml"/>
+    </bean>
+    <!--    声明mybatis的扫描器，创建dao对象-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+        <property name="basePackage" value="com.lck.mapper"></property>
+    </bean>
+
+    <!--声明service的注解-->
+    <context:component-scan base-package="com.lck.service.impl"/>
+
+    <!--设置事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!--添加事务的切面-->
+    <tx:advice id="myadvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="*select*" read-only="true"/>
+            <tx:method name="*find*" read-only="true"/>
+            <tx:method name="*search*" read-only="true"/>
+            <tx:method name="*get*" read-only="true"/>
+            <tx:method name="*insert*" propagation="REQUIRED"/>
+            <tx:method name="*save*" propagation="REQUIRED"/>
+            <tx:method name="*add*" propagation="REQUIRED"/>
+            <tx:method name="*delete*" propagation="REQUIRED"/>
+            <tx:method name="*remove*" propagation="REQUIRED"/>
+            <tx:method name="*clear*" propagation="REQUIRED"/>
+            <tx:method name="*update*" propagation="REQUIRED"/>
+            <tx:method name="*modify*" propagation="REQUIRED"/>
+            <tx:method name="*change*" propagation="REQUIRED"/>
+            <tx:method name="*set*" propagation="REQUIRED"/>
+            <tx:method name="*" propagation="SUPPORTS"/>
+        </tx:attributes>
+    </tx:advice>
+    <!--完成切面和切入点的织入-->
+    <aop:config>											<!--service包下的所有类 所有参数-->
+        <aop:pointcut id="mypointcut" expression="execution(* com.lck.service.*.*(..))"/>
+        <aop:advisor advice-ref="myadvice" pointcut-ref="mypointcut"/>
+    </aop:config>
+</beans>

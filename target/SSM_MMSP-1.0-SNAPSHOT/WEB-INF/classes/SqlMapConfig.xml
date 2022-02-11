@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+
+    <typeAliases>
+        <package name="com.lck.pojo"/>
+    </typeAliases>
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+        </plugin>
+    </plugins>
+    <mappers>
+        <!--name是包名：这个包中所有的mapper.xml都能一次性加载-->
+        <package name="com.lck.mapper"/>
+    </mappers>
+
+</configuration>
