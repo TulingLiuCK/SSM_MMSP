@@ -9,7 +9,7 @@
     </typeAliases>
     <plugins>
         <plugin interceptor="com.github.pagehelper.PageInterceptor">
-        </plugin>
+        </plugin> //分页插件
     </plugins>
     <mappers>
         <!--name是包名：这个包中所有的mapper.xml都能一次性加载-->
